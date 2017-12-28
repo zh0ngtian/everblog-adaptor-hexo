@@ -1,5 +1,6 @@
 const _ = require('lodash')
 const fse = require('fs-extra')
+const yaml = require('js-yaml')
 const moment = require('moment')
 const fm = require('front-matter')
 const entities = require('entities')
@@ -7,8 +8,11 @@ const enml2text = require('enml2text')
 const debug = require('debug')('everblog-adaptor-hexo')
 
 module.exports = async function (data, cleanMode = false) {
-  const dist = process.cwd() + '/source/_posts/'
-  fse.emptyDirSync(dist)
+  const configPath = process.cwd() + '/_config.yml'
+  fse.outputFileSync(configPath, yaml.safeDump(data.$blog))
+
+  const postsPath = process.cwd() + '/source/_posts/'
+  fse.emptyDirSync(postsPath)
 
   data.notes.forEach(note => {
     const defaultFrontMatter = {
@@ -24,7 +28,7 @@ module.exports = async function (data, cleanMode = false) {
     _.merge(data.attributes, defaultFrontMatter)
     contentMarkdown = fm.stringify(data)
 
-    const filename = dist + note.title + '.md'
+    const filename = postsPath + note.title + '.md'
     fse.outputFileSync(filename, contentMarkdown)
     debug(`title: ${filename}, content(markdown): ${JSON.stringify(contentMarkdown)}`)
   })
