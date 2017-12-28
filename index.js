@@ -26,7 +26,7 @@ module.exports = async function (data, cleanMode = false) {
 
     const filename = dist + note.title + '.md'
     fse.outputFileSync(filename, contentMarkdown)
-    debug(`title: ${filename}, content(markdown): ${contentMarkdown}`)
+    debug(`title: ${filename}, content(markdown): ${JSON.stringify(contentMarkdown)}`)
   })
   debug('build success!')
 }
