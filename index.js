@@ -18,25 +18,26 @@ const os = require('os')
 
 module.exports = async function (data, cleanMode = false) {
   for(let note of data.posts) {
+    const defaultFrontMatter = {
+      title: note.title,
+      date: formatDate(note.created),
+      updated: formatDate(note.updated),
+      toc: true
+      tags: note.tags,
+    }
+
     if (note.attributes.contentClass === 'yinxiang.markdown') {
-      processMarkdownNote(note)
+      processMarkdownNote(note, defaultFrontMatter)
     } else {
       note.webApiUrlPrefix = data.$webApiUrlPrefix
-      processOrdinaryNote(note)
+      processOrdinaryNote(note, defaultFrontMatter)
       sleep(5000)
     }
   }
   debug('build success!')
 }
 
-function processMarkdownNote(note) {
-  const defaultFrontMatter = {
-    title: note.title,
-    date: formatDate(note.created),
-    updated: formatDate(note.updated),
-    tags: note.tags
-  }
-
+function processMarkdownNote(note, defaultFrontMatter) {
   let allContent = entities.decodeHTML(enml2text(note.content))
   let allContentArray = allContent.split("\n")
   let encodedContentMarkdown = allContentArray[allContentArray.length - 1]
@@ -51,14 +52,7 @@ function processMarkdownNote(note) {
   debug(`title: ${filename}, content(markdown): ${JSON.stringify(contentMarkdown)}`)
 }
 
-function processOrdinaryNote(note) {
-  const defaultFrontMatter = {
-    title: note.title,
-    date: formatDate(note.created),
-    updated: formatDate(note.updated),
-    tags: note.tags
-  }
-
+function processOrdinaryNote(note, defaultFrontMatter) {
   let contentMarkdown = enml2html(note)
 
   let $ = cheerio.load(contentMarkdown)
