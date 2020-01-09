@@ -22,8 +22,8 @@ module.exports = async function (data, cleanMode = false) {
       title: note.title,
       date: formatDate(note.created),
       updated: formatDate(note.updated),
-      toc: true
-      tags: note.tags,
+      toc: true,
+      tags: note.tags
     }
 
     if (note.attributes.contentClass === 'yinxiang.markdown') {
