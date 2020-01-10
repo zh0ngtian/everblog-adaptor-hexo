@@ -18,12 +18,12 @@ const os = require('os')
 
 module.exports = async function (data, cleanMode = false) {
   for(let note of data.posts) {
-    const defaultFrontMatter = {
+    var defaultFrontMatter = {
       title: note.title,
       date: formatDate(note.created),
       updated: formatDate(note.updated),
       tags: note.tags,
-      toc: true,
+      toc: false,
       category: note.category,
       top: note.top
     }
@@ -41,9 +41,20 @@ module.exports = async function (data, cleanMode = false) {
 
 function processMarkdownNote(note, defaultFrontMatter) {
   let allContent = entities.decodeHTML(enml2text(note.content))
-  let allContentArray = allContent.split("\n")
+  let allContentArray = allContent.split('\n')
   let encodedContentMarkdown = allContentArray[allContentArray.length - 1]
   let contentMarkdown = urlencode.decode(encodedContentMarkdown, 'utf-8')
+
+  // delete [TOC]
+  let lines = contentMarkdown.split('\n')
+  if (lines[0] === '[TOC]') {
+    defaultFrontMatter.toc = true
+    contentMarkdown = lines.slice(1,).join('\n').trim()
+  }
+  // add <!--more-->
+  lines = contentMarkdown.split('\n')
+  lines.splice(2, 0, '<!--more-->')
+  contentMarkdown = lines.join('\n')
 
   let data = fm.parse(contentMarkdown)
   _.merge(data.attributes, defaultFrontMatter)
