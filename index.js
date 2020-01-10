@@ -22,8 +22,10 @@ module.exports = async function (data, cleanMode = false) {
       title: note.title,
       date: formatDate(note.created),
       updated: formatDate(note.updated),
+      tags: note.tags,
       toc: true,
-      tags: note.tags
+      category: note.category,
+      top: note.top
     }
 
     if (note.attributes.contentClass === 'yinxiang.markdown') {
@@ -47,7 +49,7 @@ function processMarkdownNote(note, defaultFrontMatter) {
   _.merge(data.attributes, defaultFrontMatter)
   contentMarkdown = fm.stringify(data)
 
-  const filename = 'source/_posts/' + note.tags[0] + '@' + note.title + '.md'
+  const filename = 'source/_posts/' + note.category + '@' + note.title + '.md'
   fse.outputFileSync(filename, contentMarkdown)
   debug(`title: ${filename}, content(markdown): ${JSON.stringify(contentMarkdown)}`)
 }
@@ -67,7 +69,7 @@ function processOrdinaryNote(note, defaultFrontMatter) {
   // Download all images and update the src attribute.
   if (note.resources) {
     for(let res of note.resources) {
-      resolveNoteResource(res, note.tags[0] + '@' + note.title, $)
+      resolveNoteResource(res, note.category + '@' + note.title, $)
     }
   }
 
@@ -87,9 +89,9 @@ function processOrdinaryNote(note, defaultFrontMatter) {
   contentMarkdown = fmStringify(info)
 
   const dist = process.cwd() + '/source/_posts/'
-  const filename = (dist + info.attributes.tags[0] + '@' + info.attributes.title + '.html')
+  const filename = (dist + info.attributes.category + '@' + info.attributes.title + '.html')
   fse.outputFileSync(filename, contentMarkdown)
-  debug('title-> %s, content-> %s', info.attributes.tags[0] + '@' + info.attributes.title, contentMarkdown)
+  debug('title-> %s, content-> %s', info.attributes.category + '@' + info.attributes.title, contentMarkdown)
 }
 
 function resolveNoteResource(resData, title, html) {
