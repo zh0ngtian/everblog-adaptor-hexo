@@ -53,7 +53,7 @@ function processMarkdownNote(note, defaultFrontMatter) {
   }
   // add <!--more-->
   lines = contentMarkdown.split('\n')
-  lines.splice(2, 0, '<!--more-->')
+  lines.splice(1, 0, '<!--more-->')
   contentMarkdown = lines.join('\n')
 
   let data = fm.parse(contentMarkdown)
