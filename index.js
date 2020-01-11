@@ -23,8 +23,8 @@ module.exports = async function (data, cleanMode = false) {
       date: formatDate(note.created),
       updated: formatDate(note.updated),
       tags: note.tags,
-      toc: false,
       category: note.category,
+      toc: false,
       top: note.top
     }
 
