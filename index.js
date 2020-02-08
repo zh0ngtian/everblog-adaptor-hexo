@@ -19,7 +19,7 @@ const os = require('os')
 module.exports = async function (data, cleanMode = false) {
   for(let note of data.posts) {
     var defaultFrontMatter = {
-      title: note.title,
+      title: note.title + ' | ' + note.category,
       date: formatDate(note.created),
       updated: formatDate(note.updated),
       tags: note.tags,
@@ -53,7 +53,7 @@ function processMarkdownNote(note, defaultFrontMatter) {
   }
   // add <!--more-->
   lines = contentMarkdown.split('\n')
-  if (lines.length >= 2 && lines[1][0] === '#') {
+  if (lines.length >= 3 && lines[2][0] === '#') {
     lines.splice(1, 0, '<!--more-->')
   }
   contentMarkdown = lines.join('\n')
@@ -64,7 +64,8 @@ function processMarkdownNote(note, defaultFrontMatter) {
 
   const filename = 'source/_posts/' + note.category + '@' + note.title + '.md'
   fse.outputFileSync(filename, contentMarkdown)
-  debug(`title: ${filename}, content(markdown): ${JSON.stringify(contentMarkdown)}`)
+  // debug(`title: ${filename}, content(markdown): ${JSON.stringify(contentMarkdown)}`)
+  debug(`${filename}`)
 }
 
 function processOrdinaryNote(note, defaultFrontMatter) {
@@ -104,7 +105,8 @@ function processOrdinaryNote(note, defaultFrontMatter) {
   const dist = process.cwd() + '/source/_posts/'
   const filename = (dist + info.attributes.category + '@' + info.attributes.title + '.html')
   fse.outputFileSync(filename, contentMarkdown)
-  debug('title-> %s, content-> %s', info.attributes.category + '@' + info.attributes.title, contentMarkdown)
+  // debug('title-> %s, content-> %s', info.attributes.category + '@' + info.attributes.title, contentMarkdown)
+  debug(info.attributes.category + '@' + info.attributes.title)
 }
 
 function resolveNoteResource(resData, title, html) {
