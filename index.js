@@ -51,18 +51,19 @@ function processMarkdownNote(note, defaultFrontMatter) {
     defaultFrontMatter.toc = true
     contentMarkdown = lines.slice(1,).join('\n').trim()
   }
+
   // add <!--more-->
-  lines = contentMarkdown.split('\n')
-  if (lines.length >= 3 && lines[2][0] === '#') {
-    lines.splice(1, 0, '<!--more-->')
-  }
-  contentMarkdown = lines.join('\n')
+  // lines = contentMarkdown.split('\n')
+  // if (lines.length >= 3 && lines[2][0] === '#') {
+  //   lines.splice(1, 0, '<!--more-->')
+  // }
+  // contentMarkdown = lines.join('\n')
 
   let data = fm.parse(contentMarkdown)
   _.merge(data.attributes, defaultFrontMatter)
   contentMarkdown = fm.stringify(data)
 
-  const filename = 'source/_posts/' + note.category + '@' + note.title + '.md'
+  const filename = 'source/_posts/' + note.title + ' | ' + note.category + '.md'
   fse.outputFileSync(filename, contentMarkdown)
   // debug(`title: ${filename}, content(markdown): ${JSON.stringify(contentMarkdown)}`)
   debug(`${filename}`)
@@ -83,7 +84,7 @@ function processOrdinaryNote(note, defaultFrontMatter) {
   // Download all images and update the src attribute.
   if (note.resources) {
     for(let res of note.resources) {
-      resolveNoteResource(res, note.category + '@' + note.title, $)
+      resolveNoteResource(res, note.title + ' | ' + note.category, $)
     }
   }
 
@@ -103,10 +104,10 @@ function processOrdinaryNote(note, defaultFrontMatter) {
   contentMarkdown = fmStringify(info)
 
   const dist = process.cwd() + '/source/_posts/'
-  const filename = (dist + info.attributes.category + '@' + info.attributes.title + '.html')
+  const filename = (dist + info.attributes.title + ' | ' + info.attributes.category + '.html')
   fse.outputFileSync(filename, contentMarkdown)
-  // debug('title-> %s, content-> %s', info.attributes.category + '@' + info.attributes.title, contentMarkdown)
-  debug(info.attributes.category + '@' + info.attributes.title)
+  // debug('title-> %s, content-> %s', info.attributes.title + ' | ' + info.attributes.category, contentMarkdown)
+  debug(info.attributes.title + ' | ' + info.attributes.category)
 }
 
 function resolveNoteResource(resData, title, html) {
@@ -114,6 +115,7 @@ function resolveNoteResource(resData, title, html) {
   fileName = path.basename(fileName.replace(/_/g, ''))
   const hash = bodyHashToString(resData.data.bodyHash)
   const imgFile = format('/images/{}/{}', sanitize(title), fileName)
+  debug('%s body -> %s', title, resData.data.body)
   fse.outputFileSync(format('{}/source/{}', process.cwd(), imgFile), new Buffer(resData.data.body), 'binary')
   html(format('img[hash="{}"]', hash)).attr('src', imgFile)
 }
